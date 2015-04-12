@@ -8,7 +8,6 @@ public class PCP_Transition implements TransitionProbabilityFunction<PCP_State, 
 		if(to.getHour() - from.getHour() != 1) return 0;
 		if(from.getStateOfHospital() == 2 && to.getStateOfHospital() != 1) return 0;
 		if(from.getStateOfHospital() == 1 && to.getStateOfHospital() != 0) return 0;
-		if(act.ordinal() == PCP_Action.Hospital.ordinal() && to.getStateOfHospital() == 0) return 0;
 		
 		double ans = getPrevProb(from,act);
 		if(to.getStateOfHospital() == 1 || to.getStateOfHospital() == 2) ans = ans * 0.5;
@@ -25,6 +24,9 @@ public class PCP_Transition implements TransitionProbabilityFunction<PCP_State, 
 	}
 
 	private double getPrevProb(PCP_State from, PCP_Action act) {
+		/*if(from.isLastPatientSurvived())
+			return 1;
+			*/
 		if(act.ordinal() == PCP_Action.Hospital.ordinal()){
 			if(from.getDiagnose() == 'e')
 				return 0.25;
