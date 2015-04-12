@@ -1,34 +1,43 @@
 import aima.core.probability.mdp.TransitionProbabilityFunction;
 
 public class PCP_Transition implements TransitionProbabilityFunction<PCP_State, PCP_Action>{
+
 	@Override
-	public double probability(PCP_State stateSrc, PCP_State stateDst, PCP_Action act) {
-		//System.out.println(stateSrc +" "+stateDst +" " + act);
-		int homeAct = PCP_Action.Home.ordinal();
-		double ans = 1;
-		if(stateSrc.getStateOfHospital() == 2 && stateDst.getStateOfHospital() != 1) return 0;
-		if(stateSrc.getStateOfHospital() == 1 && stateDst.getStateOfHospital() != 0) return 0;
-		if(stateDst.getHour() - stateSrc.getHour() != 1) return 0;
-		if(stateSrc.getHour() == 14) return 0;
-		if(stateDst.getDiagnose() == 'f'){
-			ans*=0.8;
+	public double probability(PCP_State from, PCP_State to, PCP_Action act) {
+		if(from.getDiagnose() == 's') return 1;
+		if(to.getHour() - from.getHour() != 1) return 0;
+		if(from.getStateOfHospital() == 2 && to.getStateOfHospital() != 1) return 0;
+		if(from.getStateOfHospital() == 1 && to.getStateOfHospital() != 0) return 0;
+		if(act.ordinal() == PCP_Action.Hospital.ordinal() && to.getStateOfHospital() == 0) return 0;
+		
+		double ans = getPrevProb(from,act);
+		if(to.getStateOfHospital() == 1 || to.getStateOfHospital() == 2) ans = ans * 0.5;
+		if(to.getDiagnose() == 'f'){
+			ans = ans * 0.8;
 		}
-		else if(stateDst.getDiagnose() == 'c'){
-			ans*=0.1;
-			if(act.ordinal() == homeAct){
-				ans*=0.5;
-			}
+		else if(to.getDiagnose() == 'c'){
+			ans = ans * 0.1;
 		}
-		else if(stateDst.getDiagnose() == 'e'){
-			ans*=0.1;
-			if(act.ordinal() == homeAct){
-				ans*=0;
-			}
-			else{ //Hospital
-				ans*=0.25;
-			}
+		else if(to.getDiagnose() == 'e'){
+			ans = ans * 0.1;
 		}
 		return ans;
 	}
 
+	private double getPrevProb(PCP_State from, PCP_Action act) {
+		if(act.ordinal() == PCP_Action.Hospital.ordinal()){
+			if(from.getDiagnose() == 'e')
+				return 0.25;
+			else
+				return 1;
+		}
+		else{
+			if(from.getDiagnose() == 'e')
+				return 0;
+			else if(from.getDiagnose() == 'c')
+				return 0.5;
+			else 
+				return 1;
+		}
+	}
 }

@@ -4,19 +4,16 @@ import java.util.Map;
 import java.util.Set;
 
 import aima.core.probability.mdp.MarkovDecisionProcess;
-import aima.core.probability.mdp.Policy;
-import aima.core.probability.mdp.PolicyEvaluation;
-import aima.core.probability.mdp.search.PolicyIteration;
 import aima.core.probability.mdp.search.ValueIteration;
 
 public class Main {
+	final static PCP_State initialState = new PCP_State(0, 9, 's', true);
 	@SuppressWarnings("rawtypes")
 	public static void main(String[] args) {
 		final PCP_Reward reward = new PCP_Reward();
 		final Set<PCP_State> states = new HashSet<PCP_State>();
 		final PCP_Transition transFunc = new PCP_Transition();
 		generateStates(states);
-		final PCP_State initialState = new PCP_State(0, 9, 'c', false);
 		MarkovDecisionProcess<PCP_State, PCP_Action> mdp = new MarkovDecisionProcess<PCP_State, PCP_Action>() {
 			@Override
 			public double transitionProbability(PCP_State arg0, PCP_State arg1,
@@ -40,6 +37,11 @@ public class Main {
 				return initialState;
 			}
 			
+			/**
+			 * Actions function.
+			 * If hour is 14, we are done. Return empty list.
+			 * Else, check the state of the hospital, if empty, we can add the action.
+			 */
 			@Override
 			public Set<PCP_Action> actions(PCP_State state) {
 				if(state.getHour() == 14) return new HashSet<PCP_Action>();
@@ -52,25 +54,24 @@ public class Main {
 				}
 			}
 		};
-		ValueIteration<PCP_State, PCP_Action> vi = new ValueIteration<PCP_State, PCP_Action>(1);
+		ValueIteration<PCP_State, PCP_Action> vi = new ValueIteration<PCP_State, PCP_Action>(0.7);
 		Map<PCP_State, Double> mp = vi.valueIteration(mdp, 0.7);
+		
+		System.out.println("#####################################");
 		Iterator it = mp.entrySet().iterator();
 		double percentage = 0;
 		int count = 0;
 		while(it.hasNext()){
 			Map.Entry pair = (Map.Entry)it.next();
-	        System.out.println(pair.getKey() + " = " + pair.getValue());
-	        if(((PCP_State)pair.getKey()).getHour() == 14){
-		        percentage += (double)pair.getValue();
-		        count++;
-	        }
+			if(((PCP_State)pair.getKey()).getDiagnose() == 's')
+					System.out.println(pair.getValue());
 	        it.remove();
 		}
-		System.out.println("Saved: "+(percentage/count) +" people. In "+count+" situations");
 	}
 
 	private static void generateStates(Set<PCP_State> states){
-		int[] hours = {10,11,12,13,14};
+		states.add(initialState);
+		int[] hours = {9,10,11,12,13,14};
 		int[] stateOfHospital = {0,1,2};
 		char[] diagnose = {'c','f','e'};
 		boolean[] lastPatientSurvived = {true,false};
