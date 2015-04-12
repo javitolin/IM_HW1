@@ -66,7 +66,7 @@ public class Main {
 	        }
 	        it.remove();
 		}
-		System.out.println("Saved: "+(percentage/count) +" people.");
+		System.out.println("Saved: "+(percentage/count) +" people. In "+count+" situations");
 	}
 
 	private static void generateStates(Set<PCP_State> states){

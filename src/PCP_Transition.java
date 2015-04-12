@@ -18,9 +18,6 @@ public class PCP_Transition implements TransitionProbabilityFunction<PCP_State, 
 			if(act.ordinal() == homeAct){
 				ans*=0.5;
 			}
-			else{ //Hospital
-				ans*=1;
-			}
 		}
 		else if(stateDst.getDiagnose() == 'e'){
 			ans*=0.1;
