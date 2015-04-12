@@ -6,7 +6,6 @@ public class PCP_Transition implements TransitionProbabilityFunction<PCP_State, 
 		//System.out.println(stateSrc +" "+stateDst +" " + act);
 		int homeAct = PCP_Action.Home.ordinal();
 		double ans = 1;
-		
 		if(stateSrc.getStateOfHospital() == 2 && stateDst.getStateOfHospital() != 1) return 0;
 		if(stateSrc.getStateOfHospital() == 1 && stateDst.getStateOfHospital() != 0) return 0;
 		if(stateDst.getHour() - stateSrc.getHour() != 1) return 0;

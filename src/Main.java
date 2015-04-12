@@ -4,9 +4,13 @@ import java.util.Map;
 import java.util.Set;
 
 import aima.core.probability.mdp.MarkovDecisionProcess;
+import aima.core.probability.mdp.Policy;
+import aima.core.probability.mdp.PolicyEvaluation;
+import aima.core.probability.mdp.search.PolicyIteration;
 import aima.core.probability.mdp.search.ValueIteration;
 
 public class Main {
+	@SuppressWarnings("rawtypes")
 	public static void main(String[] args) {
 		final PCP_Reward reward = new PCP_Reward();
 		final Set<PCP_State> states = new HashSet<PCP_State>();
@@ -51,12 +55,18 @@ public class Main {
 		ValueIteration<PCP_State, PCP_Action> vi = new ValueIteration<PCP_State, PCP_Action>(1);
 		Map<PCP_State, Double> mp = vi.valueIteration(mdp, 0.7);
 		Iterator it = mp.entrySet().iterator();
+		double percentage = 0;
+		int count = 0;
 		while(it.hasNext()){
 			Map.Entry pair = (Map.Entry)it.next();
 	        System.out.println(pair.getKey() + " = " + pair.getValue());
+	        if(((PCP_State)pair.getKey()).getHour() == 14){
+		        percentage += (double)pair.getValue();
+		        count++;
+	        }
 	        it.remove();
 		}
-		
+		System.out.println("Saved: "+(percentage/count) +" people.");
 	}
 
 	private static void generateStates(Set<PCP_State> states){
