@@ -7,10 +7,9 @@ import aima.core.probability.mdp.MarkovDecisionProcess;
 import aima.core.probability.mdp.search.ValueIteration;
 
 public class Main {
-	final static PCP_State initialState = new PCP_State(0, 9, 's', true);
+	final static PCP_State initialState = new PCP_State(0, 9, 'n', false);
 	@SuppressWarnings("rawtypes")
 	public static void main(String[] args) {
-		final PCP_Reward reward = new PCP_Reward();
 		final Set<PCP_State> states = new HashSet<PCP_State>();
 		final PCP_Transition transFunc = new PCP_Transition();
 		generateStates(states);
@@ -27,9 +26,8 @@ public class Main {
 			}
 			
 			@Override
-			public double reward(PCP_State arg0) {
-				double ans = reward.reward(arg0);
-				return ans;
+			public double reward(PCP_State state) {
+				return (state.isLastPatientSurvived() ? 1 : 0);
 			}
 			
 			@Override
@@ -54,26 +52,25 @@ public class Main {
 				}
 			}
 		};
-		ValueIteration<PCP_State, PCP_Action> vi = new ValueIteration<PCP_State, PCP_Action>(0.7);
-		Map<PCP_State, Double> mp = vi.valueIteration(mdp, 0.7);
+		ValueIteration<PCP_State, PCP_Action> vi = new ValueIteration<PCP_State, PCP_Action>(1);
+		Map<PCP_State, Double> mp = vi.valueIteration(mdp, 1);
 		
 		System.out.println("#####################################");
 		Iterator it = mp.entrySet().iterator();
-		double percentage = 0;
-		int count = 0;
 		while(it.hasNext()){
 			Map.Entry pair = (Map.Entry)it.next();
-			if(((PCP_State)pair.getKey()).getDiagnose() == 's')
+			PCP_State currState = (PCP_State)pair.getKey();
+			if(currState.getDiagnose() == 'n' && currState.getHour() == 9 && currState.getStateOfHospital() == 0
+					&& !currState.isLastPatientSurvived()) //Start State
 					System.out.println(pair.getValue());
 	        it.remove();
 		}
 	}
 
 	private static void generateStates(Set<PCP_State> states){
-		states.add(initialState);
 		int[] hours = {9,10,11,12,13,14};
 		int[] stateOfHospital = {0,1,2};
-		char[] diagnose = {'c','f','e'};
+		char[] diagnose = {'n','c','f','e'};
 		boolean[] lastPatientSurvived = {true,false};
 		for(int i = 0; i < hours.length; i++){
 			for(int j = 0; j < stateOfHospital.length; j++){
